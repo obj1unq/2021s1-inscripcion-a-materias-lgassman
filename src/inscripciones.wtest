@@ -27,8 +27,11 @@ describe "inscripciones" {
 								 }
 	)
 
-	test "testX" {
-		assert.that(true)
+	test "aprobar" {
+		roque.aprobar(epl, 6)
+		assert.that(roque.aprobada(epl))
+		assert.that(roque.aprobada(obj1))
+		assert.that(roque.aprobada(mate1))
 	}
 
 }
