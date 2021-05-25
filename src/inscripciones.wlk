@@ -18,9 +18,17 @@ class Estudiante {
 	method aprobada(materia) {
 		return cursadasAprobadas.any({cursada => cursada.materia() == materia})
 	}
+	
+	method promedio() {
+		return cursadasAprobadas.sum({cursada => cursada.nota()}) / self.cantidadMateriasAprobadas()
+	}
+	
+	method cantidadMateriasAprobadas() {
+		return cursadasAprobadas.size()
+	}
 }
 
 class Cursada {
-	const nota
+	const property nota
 	const property materia
 }

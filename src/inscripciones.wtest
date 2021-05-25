@@ -33,6 +33,15 @@ describe "inscripciones" {
 		assert.that(roque.aprobada(obj1))
 		assert.that(roque.aprobada(mate1))
 	}
+	
+	test "cantidad de materias aprobadas" {
+		assert.equals(2, roque.cantidadMateriasAprobadas())
+	}
+	
+	test "promedio" {
+		assert.equals(8.50, roque.promedio())
+	}
+	
 
 }
 
