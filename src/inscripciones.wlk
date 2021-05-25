@@ -22,7 +22,13 @@ class Estudiante {
 	const carreras = #{}
 	const materiasInscriptas = #{}
 	
+	method validarAprobacion(materia) {
+		if(self.aprobada(materia)) {
+			self.error("la materia ya está aprobada")
+		}
+	}
 	method aprobar(materia, nota) {
+		self.validarAprobacion(materia)
 		cursadasAprobadas.add(new Cursada(materia=materia, nota=nota))
 	}
 	

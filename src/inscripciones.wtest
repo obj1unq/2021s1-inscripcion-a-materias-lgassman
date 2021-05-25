@@ -56,6 +56,10 @@ describe "inscripciones" {
 		
 		
 	}
+	
+	test "aprobar a una materia ya aprobada" {
+		assert.throwsException({roque.aprobar(mate1, 10)})
+	}
 
 }
 
