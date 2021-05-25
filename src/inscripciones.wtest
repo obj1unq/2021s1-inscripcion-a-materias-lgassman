@@ -42,6 +42,9 @@ describe "inscripciones" {
 		assert.equals(8.50, roque.promedio())
 	}
 	
+	test "materias de sus carreras" {
+		assert.equals(#{ epl, mate1, obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
+	}
 
 }
 

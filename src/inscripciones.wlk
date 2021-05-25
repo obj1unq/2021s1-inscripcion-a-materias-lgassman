@@ -4,7 +4,7 @@ class Materia {
 }
 
 class Carrera {
-	const materias
+	const property materias
 }
 
 class Estudiante {
@@ -25,6 +25,11 @@ class Estudiante {
 	
 	method cantidadMateriasAprobadas() {
 		return cursadasAprobadas.size()
+	}
+	
+	method todasLasMaterias() {
+		return carreras.flatMap({carrera => carrera.materias()})
+		//return carreras.map({carrera => carrera.materias()}).flatten().asSet()
 	}
 }
 
