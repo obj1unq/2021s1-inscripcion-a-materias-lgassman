@@ -1,0 +1,35 @@
+import inscripciones.*
+
+describe "inscripciones" {
+
+	const epl = new Materia()
+	const mate1 = new Materia()
+	const obj1 = new Materia()
+	const obj2 = new Materia()
+	const obj3 = new Materia()
+	const tip = new Materia()
+	const bd = new Materia()
+	const quimica = new Materia()
+	const biologia1 = new Materia()
+	const biologia2 = new Materia()
+	const anatomia = new Materia()
+	const latin = new Materia()
+	const romano = new Materia()
+	const historia = new Materia()
+	const penal1 = new Materia()
+	const penal2 = new Materia()
+	const programacion = new Carrera(materias = #{ epl, mate1, obj1, obj2, obj3, tip, bd })
+	const medicina = new Carrera(materias = #{ quimica, biologia1, biologia2, anatomia })
+	const derecho = new Carrera(materias = #{ latin, romano, historia, penal1, penal2 })
+	const roque = new Estudiante(carreras = #{ programacion, medicina }, 
+								 cursadasAprobadas = #{ new Cursada(materia=mate1, nota=7), 
+								 						new Cursada(materia=obj1, nota=10)
+								 }
+	)
+
+	test "testX" {
+		assert.that(true)
+	}
+
+}
+
