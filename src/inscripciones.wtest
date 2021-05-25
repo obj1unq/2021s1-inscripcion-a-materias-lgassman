@@ -5,8 +5,8 @@ describe "inscripciones" {
 	const epl = new Materia()
 	const mate1 = new Materia()
 	const obj1 = new Materia()
-	const obj2 = new Materia()
-	const obj3 = new Materia()
+	const obj2 = new Materia(requisitos=#{obj1, mate1})
+	const obj3 = new Materia(requisitos=#{mate1, obj2})
 	const tip = new Materia()
 	const bd = new Materia()
 	const quimica = new Materia()
@@ -23,9 +23,9 @@ describe "inscripciones" {
 	const derecho = new Carrera(materias = #{ latin, romano, historia, penal1, penal2 })
 	const roque = new Estudiante(carreras = #{ programacion, medicina }, 
 								 cursadasAprobadas = #{ new Cursada(materia=mate1, nota=7), 
-								 						new Cursada(materia=obj1, nota=10)
-								 }
-	)
+								 						new Cursada(materia=obj1, nota=10)},
+								 materiasInscriptas = #{epl}
+								 )
 
 	test "aprobar" {
 		roque.aprobar(epl, 6)
@@ -44,6 +44,17 @@ describe "inscripciones" {
 	
 	test "materias de sus carreras" {
 		assert.equals(#{ epl, mate1, obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
+	}
+	
+	test "puede inscribirse" {
+		
+		assert.that(roque.puedeInscribirse(obj2))
+		assert.notThat(roque.puedeInscribirse(historia)) // no es de la carrera
+		assert.notThat(roque.puedeInscribirse(obj1)) // ya la aprobo
+		assert.notThat(roque.puedeInscribirse(obj3)) // no cumple requisistos
+		assert.notThat(roque.puedeInscribirse(epl)) // ya inscripto 		
+		
+		
 	}
 
 }
