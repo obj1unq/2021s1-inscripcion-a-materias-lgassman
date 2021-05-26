@@ -2,53 +2,37 @@
 class Materia {
 	const requisitos = #{}
 	
-	var property cupo = 30
-	const property confirmados = []
-	const property espera = []
+	const property cupo = 30
+	const property inscriptos = []
 	
 	method requisitosAprobados(estudiante) {
 		return requisitos.all({requisito => estudiante.aprobada(requisito)})
 	}
 	
 	method validarInscripcion(alumno) {
-		if(self.enEspera(alumno) || self.confirmado(alumno)) {
+		if(self.inscripto(alumno)) {
 			self.error("el alumno ya esta en la materia")
 		}
 	}
 	method inscribir(alumno) {
 		self.validarInscripcion(alumno)
-		if(cupo > 0) {
-			confirmados.add(alumno)
-			cupo--
-		}
-		else {
-			espera.add(alumno)
-		}
+		inscriptos.add(alumno)
 	}
 	
 	method desinscribir(alumno) {
-		if(self.enEspera(alumno)) {
-			espera.remove(alumno)
-		}
-		else {
-			confirmados.remove(alumno)
-			if(espera.size() > 0) {
-				const aConfirmar = espera.get(0)
-				confirmados.add(aConfirmar)
-				espera.remove(aConfirmar)
-			}
-			else {
-				cupo++
-			}
-		}
+		inscriptos.remove(alumno)
 	}
 	
-	method enEspera(alumno) {
-		return espera.contains(alumno)
+	method espera() {
+		return if (cupo < inscriptos.size())  inscriptos.subList(cupo) else []
 	}
 	
-	method confirmado(alumno) {
-		return confirmados.contains(alumno)
+	method confirmados() {
+		return if (cupo < inscriptos.size()) inscriptos.subList(0, cupo-1) else inscriptos
+	}
+	
+	method inscripto(estudiante) {
+		return inscriptos.contains(estudiante)
 	}
 	
 }

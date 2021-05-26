@@ -82,7 +82,6 @@ describe "inscripciones" {
 		maria.inscribir(bd)
 		maria.desinscribir(bd)
 		
-		assert.equals(0, bd.cupo())
 		assert.equals([roque] , bd.confirmados())
 		assert.that(bd.espera().isEmpty())
 		assert.notThat(maria.inscripto(bd))
@@ -93,14 +92,12 @@ describe "inscripciones" {
 		maria.inscribir(bd)
 		roque.desinscribir(bd)
 		
-		assert.equals(0, bd.cupo())
 		assert.equals([maria] , bd.confirmados())
 		assert.that(bd.espera().isEmpty())
 		assert.notThat(roque.inscripto(bd))
 		assert.that(maria.inscripto(bd))
 		
 		maria.desinscribir(bd)
-		assert.equals(1, bd.cupo())
 		assert.that(bd.confirmados().isEmpty())
 		assert.that(bd.espera().isEmpty())
 		assert.notThat(roque.inscripto(bd))
