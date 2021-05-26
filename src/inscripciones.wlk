@@ -11,7 +11,7 @@ class Materia {
 	}
 	
 	method validarInscripcion(alumno) {
-		if(self.enEspera(alumno) || self.confirmado(alumno)) {
+		if(self.inscripto(alumno)) {
 			self.error("el alumno ya esta en la materia")
 		}
 	}
@@ -51,6 +51,9 @@ class Materia {
 		return confirmados.contains(alumno)
 	}
 	
+	method inscripto(alumno) {
+		return self.enEspera(alumno) || self.confirmado(alumno)
+	}
 }
 
 class Carrera {
@@ -59,13 +62,16 @@ class Carrera {
 	method contiene(materia) {
 		return materias.contains(materia)
 	}
+	
+	method materiasInscriptas(estudiante) {
+		return materias.filter({materia => materia.inscripto(estudiante)})
+	}
 }
 
 class Estudiante {
 	
 	const cursadasAprobadas = #{}
 	const carreras = #{}
-	const materiasInscriptas = #{}
 	
 	method validarAprobacion(materia) {
 		if(self.aprobada(materia)) {
@@ -107,7 +113,7 @@ class Estudiante {
 	}
 	
 	method inscripto (materia) {
-		return materiasInscriptas.contains(materia)
+		return self.materiasInscriptas().contains(materia)
 	} 
 	
 	method validarInscripcion(materia) {
@@ -118,7 +124,6 @@ class Estudiante {
 	method inscribir(materia) {
 		self.validarInscripcion(materia)
 		materia.inscribir(self)
-		materiasInscriptas.add(materia)
 	}
 	
 	method validarDesincripcion(materia) {
@@ -130,7 +135,10 @@ class Estudiante {
 	method desinscribir(materia) {
 		self.validarDesincripcion(materia)
 		materia.desinscribir(self)
-		materiasInscriptas.remove(materia)
+	}
+	
+	method materiasInscriptas() {
+		return carreras.flatMap({carrera => carrera.materiasInscriptas(self)})
 	}
 	
 }
