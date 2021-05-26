@@ -6,6 +6,7 @@ class Materia {
 	const property espera = []
 	const property anio = 1
 	const property creditos = 5
+	const property estrategiaEspera = estrategiaCola
 	
 	method requisitosAprobados(estudiante) {
 		return true		
@@ -34,7 +35,7 @@ class Materia {
 		else {
 			confirmados.remove(alumno)
 			if(espera.size() > 0) {
-				const aConfirmar = espera.get(0)
+				const aConfirmar = estrategiaEspera.proximo(espera)
 				confirmados.add(aConfirmar)
 				espera.remove(aConfirmar)
 			}
@@ -65,7 +66,7 @@ class MateriaConPrevias inherits Materia{
 
 class MateriaPorCreditos inherits Materia {
 	
-	const creditosNecesarios
+	var property creditosNecesarios
 	override method requisitosAprobados(estudiante) {
 			return estudiante.creditos() >= creditosNecesarios
 	}	
@@ -76,6 +77,30 @@ class MateriaPorAnio inherits Materia{
 	override method requisitosAprobados(estudiante) {
 			return estudiante.aproboAnioAnterior(self)
 	}	
+
+}
+
+object estrategiaCola {
+	
+	method proximo(lista) {
+		return lista.get(0)
+	}
+}
+
+object estrategiaElitista {
+	
+	method proximo(lista) {
+		return lista.max({estudiante => estudiante.promedio()})
+	}
+	
+}
+
+object estrategiaAvance {
+	
+	method proximo(lista) {
+		return lista.max({estudiante => estudiante.cantidadMateriasAprobadas()})
+	}
+	
 }
 
 
@@ -113,7 +138,8 @@ class Estudiante {
 	}
 	
 	method promedio() {
-		return cursadasAprobadas.sum({cursada => cursada.nota()}) / self.cantidadMateriasAprobadas()
+		const cantidad = self.cantidadMateriasAprobadas()
+		return if (cantidad > 0) cursadasAprobadas.sum({cursada => cursada.nota()}) / cantidad else 0
 	}
 	
 	method cantidadMateriasAprobadas() {
