@@ -2,12 +2,12 @@ import inscripciones.*
 
 describe "inscripciones" {
 
-	const epl = new Materia(cupo=1, estrategiaEspera=estrategiaElitista)
+	const epl = new MateriaEsperaElitista(cupo=1)
 	const mate1 = new Materia()
 	const obj1 = new Materia()
 	const obj2 = new Materia(requisitos=#{obj1, mate1})
 	const obj3 = new Materia(requisitos=#{mate1, obj2})
-	const tip = new Materia( cupo=1, estrategiaEspera=estrategiaAvance)
+	const tip = new MateriaEsperaPorAvance( cupo=1 )
 	const bd = new Materia(cupo=1)
 	const quimica = new Materia()
 	const biologia1 = new Materia()

@@ -5,7 +5,6 @@ class Materia {
 	var property cupo = 30
 	const property confirmados = []
 	const property espera = []
-	const property estrategiaEspera = estrategiaCola
 	
 	method requisitosAprobados(estudiante) {
 		return requisitos.all({requisito => estudiante.aprobada(requisito)})
@@ -34,7 +33,7 @@ class Materia {
 		else {
 			confirmados.remove(alumno)
 			if(espera.size() > 0) {
-				const aConfirmar = estrategiaEspera.proximo(espera)
+				const aConfirmar = self.proximo()
 				confirmados.add(aConfirmar)
 				espera.remove(aConfirmar)
 			}
@@ -52,27 +51,24 @@ class Materia {
 		return confirmados.contains(alumno)
 	}
 	
-}
-
-object estrategiaCola {
-	
-	method proximo(lista) {
-		return lista.get(0)
+	method proximo() {
+		return espera.get(0)
 	}
 }
 
-object estrategiaElitista {
+
+class MateriaEsperaElitista inherits Materia{
 	
-	method proximo(lista) {
-		return lista.max({estudiante => estudiante.promedio()})
+	override method proximo() {
+		return espera.max({estudiante => estudiante.promedio()})
 	}
 	
 }
 
-object estrategiaAvance {
+class MateriaEsperaPorAvance inherits Materia {
 	
-	method proximo(lista) {
-		return lista.max({estudiante => estudiante.cantidadMateriasAprobadas()})
+	override method proximo() {
+		return espera.max({estudiante => estudiante.cantidadMateriasAprobadas()})
 	}
 	
 }
