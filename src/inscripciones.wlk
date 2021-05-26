@@ -1,16 +1,14 @@
 /** First Wollok example */
 class Materia {
-	const property requisitos = #{}
 	
 	var property cupo = 30
 	const property confirmados = []
 	const property espera = []
 	const property anio = 1
 	const property creditos = 5
-	const property estrategiaRequisitos = previas 
 	
 	method requisitosAprobados(estudiante) {
-		return estrategiaRequisitos.cumpleRequisitos(estudiante, self)
+		return true		
 	}
 	
 	method validarInscripcion(alumno) {
@@ -56,28 +54,27 @@ class Materia {
 	
 }
 
-object sinRequisitos {
-	method cumpleRequisitos(estudiante, materia) {
-		return true		
-	}	
-}
-
-object previas {
-	method cumpleRequisitos(estudiante, materia) {
-			return materia.requisitos().all({requisito => estudiante.aprobada(requisito)})
+ 
+class MateriaConPrevias inherits Materia{
+	const property requisitos = #{}
+	
+	override method requisitosAprobados(estudiante) {
+		return requisitos.all({requisito => estudiante.aprobada(requisito)})
 	}
 }
 
-class InscripcionPorCreditos {
+class MateriaPorCreditos inherits Materia {
+	
 	const creditosNecesarios
-	method cumpleRequisitos(estudiante, materia) {
+	override method requisitosAprobados(estudiante) {
 			return estudiante.creditos() >= creditosNecesarios
 	}	
 }
 
-object inscripcionPorAnio {
-	method cumpleRequisitos(estudiante, materia) {
-			return estudiante.aproboAnioAnterior(materia)
+class MateriaPorAnio inherits Materia{
+	
+	override method requisitosAprobados(estudiante) {
+			return estudiante.aproboAnioAnterior(self)
 	}	
 }
 

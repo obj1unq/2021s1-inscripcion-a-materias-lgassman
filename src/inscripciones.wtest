@@ -2,15 +2,15 @@ import inscripciones.*
 
 describe "inscripciones" {
 
-	const epl = new Materia(estrategiaRequisitos=sinRequisitos)
+	const epl = new Materia()
 	const mate1 = new Materia(anio=2)
-	const mate2 = new Materia(anio=3, estrategiaRequisitos=inscripcionPorAnio)
-	const mate3 = new Materia(anio=3, estrategiaRequisitos=new InscripcionPorCreditos(creditosNecesarios=10))
- 	const mate4 = new Materia(anio=4, estrategiaRequisitos=inscripcionPorAnio)
+	const mate2 = new MateriaPorAnio(anio=3)
+	const mate3 = new MateriaPorCreditos(anio=3, creditosNecesarios=10)
+ 	const mate4 = new MateriaPorAnio(anio=4)
 	const obj1 = new Materia(anio=2)
-	const obj2 = new Materia(requisitos=#{obj1, mate1})
-	const obj3 = new Materia(requisitos=#{mate1, obj2})
-	const tip = new Materia(anio=4, estrategiaRequisitos=new InscripcionPorCreditos(creditosNecesarios=150) )
+	const obj2 = new MateriaConPrevias(requisitos=#{obj1, mate1})
+	const obj3 = new MateriaConPrevias(requisitos=#{mate1, obj2})
+	const tip = new MateriaPorCreditos(anio=4, creditosNecesarios=150 )
 	const bd = new Materia(anio=3, cupo=1)
 	const quimica = new Materia()
 	const biologia1 = new Materia()
