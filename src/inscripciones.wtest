@@ -2,13 +2,16 @@ import inscripciones.*
 
 describe "inscripciones" {
 
-	const epl = new Materia()
-	const mate1 = new Materia()
-	const obj1 = new Materia()
+	const epl = new Materia(estrategiaRequisitos=sinRequisitos)
+	const mate1 = new Materia(anio=2)
+	const mate2 = new Materia(anio=3, estrategiaRequisitos=inscripcionPorAnio)
+	const mate3 = new Materia(anio=3, estrategiaRequisitos=new InscripcionPorCreditos(creditosNecesarios=10))
+ 	const mate4 = new Materia(anio=4, estrategiaRequisitos=inscripcionPorAnio)
+	const obj1 = new Materia(anio=2)
 	const obj2 = new Materia(requisitos=#{obj1, mate1})
 	const obj3 = new Materia(requisitos=#{mate1, obj2})
-	const tip = new Materia()
-	const bd = new Materia(cupo=1)
+	const tip = new Materia(anio=4, estrategiaRequisitos=new InscripcionPorCreditos(creditosNecesarios=150) )
+	const bd = new Materia(anio=3, cupo=1)
 	const quimica = new Materia()
 	const biologia1 = new Materia()
 	const biologia2 = new Materia()
@@ -18,7 +21,7 @@ describe "inscripciones" {
 	const historia = new Materia()
 	const penal1 = new Materia()
 	const penal2 = new Materia()
-	const programacion = new Carrera(materias = #{ epl, mate1, obj1, obj2, obj3, tip, bd })
+	const programacion = new Carrera( materias = #{ epl, mate1, mate2,mate3,mate4, obj1, obj2, obj3, tip, bd })
 	const medicina = new Carrera(materias = #{ quimica, biologia1, biologia2, anatomia })
 	const derecho = new Carrera(materias = #{ latin, romano, historia, penal1, penal2 })
 	const roque = new Estudiante(carreras = #{ programacion, medicina }, 
@@ -47,7 +50,7 @@ describe "inscripciones" {
 	}
 	
 	test "materias de sus carreras" {
-		assert.equals(#{ epl, mate1, obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
+		assert.equals(#{ epl, mate1, mate2,  mate3,mate4,obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
 	}
 	
 	test "puede inscribirse" {
@@ -108,6 +111,19 @@ describe "inscripciones" {
 		
 		 
 	}
+	
+	test "inscripcion por credito" {
+		
+		assert.that(roque.puedeInscribirse(mate2))
+		assert.notThat(roque.puedeInscribirse(tip))
+	}
+	
+	test "inscripcion por anio" {
+		
+		assert.that(roque.puedeInscribirse(mate2))
+		assert.notThat(roque.puedeInscribirse(mate4))
+	}
+	
 
 }
 

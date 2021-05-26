@@ -1,13 +1,16 @@
 /** First Wollok example */
 class Materia {
-	const requisitos = #{}
+	const property requisitos = #{}
 	
 	var property cupo = 30
 	const property confirmados = []
 	const property espera = []
+	const property anio = 1
+	const property creditos = 5
+	const property estrategiaRequisitos = previas 
 	
 	method requisitosAprobados(estudiante) {
-		return requisitos.all({requisito => estudiante.aprobada(requisito)})
+		return estrategiaRequisitos.cumpleRequisitos(estudiante, self)
 	}
 	
 	method validarInscripcion(alumno) {
@@ -53,11 +56,42 @@ class Materia {
 	
 }
 
+object sinRequisitos {
+	method cumpleRequisitos(estudiante, materia) {
+		return true		
+	}	
+}
+
+object previas {
+	method cumpleRequisitos(estudiante, materia) {
+			return materia.requisitos().all({requisito => estudiante.aprobada(requisito)})
+	}
+}
+
+class InscripcionPorCreditos {
+	const creditosNecesarios
+	method cumpleRequisitos(estudiante, materia) {
+			return estudiante.creditos() >= creditosNecesarios
+	}	
+}
+
+object inscripcionPorAnio {
+	method cumpleRequisitos(estudiante, materia) {
+			return estudiante.aproboAnioAnterior(materia)
+	}	
+}
+
+
+
 class Carrera {
 	const property materias
 	
 	method contiene(materia) {
 		return materias.contains(materia)
+	}
+	
+	method materiasDelAnio(anio) {
+		return materias.filter({materia=>materia.anio() == anio})
 	}
 }
 
@@ -133,9 +167,25 @@ class Estudiante {
 		materiasInscriptas.remove(materia)
 	}
 	
+	method creditos() {
+		return cursadasAprobadas.sum({cursada => cursada.credito()})
+	}
+	
+	method aproboAnioAnterior(materia) {
+		const carrera = self.carreraDe(materia)
+		const materiasAnteriores = carrera.materiasDelAnio(materia.anio() - 1)
+		return materiasAnteriores.all({materiaAnterior => self.aprobada(materiaAnterior)})
+	}
+	
+	method carreraDe(materia) {
+		return carreras.find({carrera => carrera.contiene(materia)})
+	}
 }
 
 class Cursada {
 	const property nota
 	const property materia
+	method credito() {
+		return materia.creditos()
+	}
 }
