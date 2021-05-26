@@ -2,12 +2,12 @@ import inscripciones.*
 
 describe "inscripciones" {
 
-	const epl = new Materia()
+	const epl = new Materia(cupo=1, estrategiaEspera=estrategiaElitista)
 	const mate1 = new Materia()
 	const obj1 = new Materia()
 	const obj2 = new Materia(requisitos=#{obj1, mate1})
 	const obj3 = new Materia(requisitos=#{mate1, obj2})
-	const tip = new Materia()
+	const tip = new Materia( cupo=1, estrategiaEspera=estrategiaAvance)
 	const bd = new Materia(cupo=1)
 	const quimica = new Materia()
 	const biologia1 = new Materia()
@@ -26,9 +26,11 @@ describe "inscripciones" {
 								 						new Cursada(materia=obj1, nota=10)})
 								 
 	const maria = new Estudiante(carreras=#{programacion})
+	const andrea = new Estudiante(carreras=#{programacion})
 	
 	fixture {
 		roque.inscribir(epl)
+		andrea.aprobar(obj1, 10)
 	}
 
 	test "aprobar" {
@@ -88,26 +90,100 @@ describe "inscripciones" {
 		assert.notThat(maria.inscripto(bd))
 	}
 
-	test "desinscribir confirmado" {
+	test "desinscribir confirmado estrategia cola" {
 		roque.inscribir(bd)
 		maria.inscribir(bd)
+		andrea.inscribir(bd)
 		roque.desinscribir(bd)
 		
 		assert.equals(0, bd.cupo())
 		assert.equals([maria] , bd.confirmados())
-		assert.that(bd.espera().isEmpty())
+		assert.equals([andrea], bd.espera())
 		assert.notThat(roque.inscripto(bd))
 		assert.that(maria.inscripto(bd))
+		assert.that(andrea.inscripto(bd))
 		
 		maria.desinscribir(bd)
+		assert.equals(0, bd.cupo())
+		assert.equals([andrea], bd.confirmados())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(roque.inscripto(bd))
+		assert.notThat(maria.inscripto(bd))
+		assert.that(andrea.inscripto(bd))
+		
+		andrea.desinscribir(bd)
 		assert.equals(1, bd.cupo())
 		assert.that(bd.confirmados().isEmpty())
 		assert.that(bd.espera().isEmpty())
 		assert.notThat(roque.inscripto(bd))
 		assert.notThat(maria.inscripto(bd))
-		
+		assert.notThat(andrea.inscripto(bd))
 		 
 	}
+	
+	test "desinscribir confirmado estreategia avance" {
+		andrea.inscribir(tip)
+		maria.inscribir(tip)
+		roque.inscribir(tip)
+		
+		andrea.desinscribir(tip)
+		
+		assert.equals(0, tip.cupo())
+		assert.equals([roque] , tip.confirmados())
+		assert.equals([maria], tip.espera())
+		assert.notThat(andrea.inscripto(tip))
+		assert.that(maria.inscripto(tip))
+		assert.that(roque.inscripto(tip))
+		
+		roque.desinscribir(tip)
+		assert.equals(0, tip.cupo())
+		assert.equals([maria], tip.confirmados())
+		assert.that(tip.espera().isEmpty())
+		assert.notThat(roque.inscripto(tip))
+		assert.that(maria.inscripto(tip))
+		assert.notThat(andrea.inscripto(tip))
+		
+		maria.desinscribir(tip)
+		assert.equals(1, tip.cupo())
+		assert.that(tip.confirmados().isEmpty())
+		assert.that(tip.espera().isEmpty())
+		assert.notThat(roque.inscripto(tip))
+		assert.notThat(maria.inscripto(tip))
+		assert.notThat(andrea.inscripto(tip))
+		 
+	}
+	
+	test "desinscribir confirmado estreategia elitista" {
+		maria.inscribir(epl)
+		andrea.inscribir(epl)
+		
+		roque.desinscribir(epl)
+		
+		assert.equals(0, epl.cupo())
+		assert.equals([andrea] , epl.confirmados())
+		assert.equals([maria], epl.espera())
+		assert.that(andrea.inscripto(epl))
+		assert.that(maria.inscripto(epl))
+		assert.notThat(roque.inscripto(epl))
+		
+		andrea.desinscribir(epl)
+		assert.equals(0, epl.cupo())
+		assert.equals([maria], epl.confirmados())
+		assert.that(epl.espera().isEmpty())
+		assert.notThat(roque.inscripto(epl))
+		assert.that(maria.inscripto(epl))
+		assert.notThat(andrea.inscripto(epl))
+		
+		maria.desinscribir(epl)
+		assert.equals(1, epl.cupo())
+		assert.that(epl.confirmados().isEmpty())
+		assert.that(epl.espera().isEmpty())
+		assert.notThat(roque.inscripto(epl))
+		assert.notThat(maria.inscripto(epl))
+		assert.notThat(andrea.inscripto(epl))
+		 
+	}
+	
 
 }
 

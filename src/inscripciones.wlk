@@ -5,6 +5,7 @@ class Materia {
 	var property cupo = 30
 	const property confirmados = []
 	const property espera = []
+	const property estrategiaEspera = estrategiaCola
 	
 	method requisitosAprobados(estudiante) {
 		return requisitos.all({requisito => estudiante.aprobada(requisito)})
@@ -33,7 +34,7 @@ class Materia {
 		else {
 			confirmados.remove(alumno)
 			if(espera.size() > 0) {
-				const aConfirmar = espera.get(0)
+				const aConfirmar = estrategiaEspera.proximo(espera)
 				confirmados.add(aConfirmar)
 				espera.remove(aConfirmar)
 			}
@@ -52,6 +53,31 @@ class Materia {
 	}
 	
 }
+
+object estrategiaCola {
+	
+	method proximo(lista) {
+		return lista.get(0)
+	}
+}
+
+object estrategiaElitista {
+	
+	method proximo(lista) {
+		return lista.max({estudiante => estudiante.promedio()})
+	}
+	
+}
+
+object estrategiaAvance {
+	
+	method proximo(lista) {
+		return lista.max({estudiante => estudiante.cantidadMateriasAprobadas()})
+	}
+	
+}
+
+
 
 class Carrera {
 	const property materias
@@ -82,7 +108,8 @@ class Estudiante {
 	}
 	
 	method promedio() {
-		return cursadasAprobadas.sum({cursada => cursada.nota()}) / self.cantidadMateriasAprobadas()
+		const cantidad = self.cantidadMateriasAprobadas()
+		return if (cantidad > 0) cursadasAprobadas.sum({cursada => cursada.nota()}) / cantidad else 0
 	}
 	
 	method cantidadMateriasAprobadas() {
