@@ -2,8 +2,53 @@
 class Materia {
 	const requisitos = #{}
 	
+	var property cupo = 30
+	const property confirmados = []
+	const property espera = []
+	
 	method requisitosAprobados(estudiante) {
 		return requisitos.all({requisito => estudiante.aprobada(requisito)})
+	}
+	
+	method validarInscripcion(alumno) {
+		if(self.enEspera(alumno) || self.confirmado(alumno)) {
+			self.error("el alumno ya esta en la materia")
+		}
+	}
+	method inscribir(alumno) {
+		self.validarInscripcion(alumno)
+		if(cupo > 0) {
+			confirmados.add(alumno)
+			cupo--
+		}
+		else {
+			espera.add(alumno)
+		}
+	}
+	
+	method desinscribir(alumno) {
+		if(self.enEspera(alumno)) {
+			espera.remove(alumno)
+		}
+		else {
+			confirmados.remove(alumno)
+			if(espera.size() > 0) {
+				const aConfirmar = espera.get(0)
+				confirmados.add(aConfirmar)
+				espera.remove(aConfirmar)
+			}
+			else {
+				cupo++
+			}
+		}
+	}
+	
+	method enEspera(alumno) {
+		return espera.contains(alumno)
+	}
+	
+	method confirmado(alumno) {
+		return confirmados.contains(alumno)
 	}
 	
 }
@@ -64,6 +109,29 @@ class Estudiante {
 	method inscripto (materia) {
 		return materiasInscriptas.contains(materia)
 	} 
+	
+	method validarInscripcion(materia) {
+		if( not self.puedeInscribirse(materia)) {
+			self.error("no se puede inscribir a esa materia")
+		}
+	}
+	method inscribir(materia) {
+		self.validarInscripcion(materia)
+		materia.inscribir(self)
+		materiasInscriptas.add(materia)
+	}
+	
+	method validarDesincripcion(materia) {
+		if (not self.inscripto(materia)) {
+			self.error("no se puede desinscribir")
+		}
+	} 
+	
+	method desinscribir(materia) {
+		self.validarDesincripcion(materia)
+		materia.desinscribir(self)
+		materiasInscriptas.remove(materia)
+	}
 	
 }
 

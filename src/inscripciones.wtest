@@ -8,7 +8,7 @@ describe "inscripciones" {
 	const obj2 = new Materia(requisitos=#{obj1, mate1})
 	const obj3 = new Materia(requisitos=#{mate1, obj2})
 	const tip = new Materia()
-	const bd = new Materia()
+	const bd = new Materia(cupo=1)
 	const quimica = new Materia()
 	const biologia1 = new Materia()
 	const biologia2 = new Materia()
@@ -23,9 +23,13 @@ describe "inscripciones" {
 	const derecho = new Carrera(materias = #{ latin, romano, historia, penal1, penal2 })
 	const roque = new Estudiante(carreras = #{ programacion, medicina }, 
 								 cursadasAprobadas = #{ new Cursada(materia=mate1, nota=7), 
-								 						new Cursada(materia=obj1, nota=10)},
-								 materiasInscriptas = #{epl}
-								 )
+								 						new Cursada(materia=obj1, nota=10)})
+								 
+	const maria = new Estudiante(carreras=#{programacion})
+	
+	fixture {
+		roque.inscribir(epl)
+	}
 
 	test "aprobar" {
 		roque.aprobar(epl, 6)
@@ -59,6 +63,50 @@ describe "inscripciones" {
 	
 	test "aprobar a una materia ya aprobada" {
 		assert.throwsException({roque.aprobar(mate1, 10)})
+	}
+	
+	test "inscribir" {
+		assert.throwsException({roque.inscribir(historia)}) // no es de la carrera
+		roque.inscribir(bd)
+		assert.that(roque.inscripto(bd))
+		maria.inscribir(bd)
+		assert.that(maria.inscripto(bd))
+		
+		assert.equals([roque] , bd.confirmados())
+		assert.equals([maria] , bd.espera())
+		
+	}
+
+	test "desinscribir en espera" {
+		roque.inscribir(bd)
+		maria.inscribir(bd)
+		maria.desinscribir(bd)
+		
+		assert.equals(0, bd.cupo())
+		assert.equals([roque] , bd.confirmados())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(maria.inscripto(bd))
+	}
+
+	test "desinscribir confirmado" {
+		roque.inscribir(bd)
+		maria.inscribir(bd)
+		roque.desinscribir(bd)
+		
+		assert.equals(0, bd.cupo())
+		assert.equals([maria] , bd.confirmados())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(roque.inscripto(bd))
+		assert.that(maria.inscripto(bd))
+		
+		maria.desinscribir(bd)
+		assert.equals(1, bd.cupo())
+		assert.that(bd.confirmados().isEmpty())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(roque.inscripto(bd))
+		assert.notThat(maria.inscripto(bd))
+		
+		 
 	}
 
 }
