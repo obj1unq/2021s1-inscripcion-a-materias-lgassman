@@ -1,0 +1,112 @@
+import inscripciones.*
+
+describe "inscripciones" {
+
+	const epl = new Materia()
+	const mate1 = new Materia()
+	const obj1 = new Materia()
+	const obj2 = new Materia(requisitos=#{obj1, mate1})
+	const obj3 = new Materia(requisitos=#{mate1, obj2})
+	const tip = new Materia()
+
+	const bd = new Materia(cupo=1)
+	const quimica = new Materia()
+	const biologia1 = new Materia()
+	const biologia2 = new Materia()
+	const anatomia = new Materia()
+	const latin = new Materia()
+	const romano = new Materia()
+	const historia = new Materia()
+	const penal1 = new Materia()
+	const penal2 = new Materia()
+	const programacion = new Carrera(materias = #{ epl, mate1, obj1, obj2, obj3, tip, bd })
+	const medicina = new Carrera(materias = #{ quimica, biologia1, biologia2, anatomia })
+	const derecho = new Carrera(materias = #{ latin, romano, historia, penal1, penal2 })
+	
+	const roque = new Estudiante(carreras = #{ programacion, medicina }, 
+								 cursadasAprobadas = #{ new CursadaAprobada(materia=mate1, nota=7), 
+								 						new CursadaAprobada(materia=obj1, nota=10)})
+								 
+	const maria = new Estudiante(carreras=#{programacion})
+	
+	fixture {
+		roque.inscribir(epl)
+	}
+
+	test "aprobar" {
+		roque.aprobar(epl, 6)
+		assert.that(roque.aprobada(epl))
+		assert.that(roque.aprobada(obj1))
+		assert.that(roque.aprobada(mate1))
+		assert.notThat(roque.aprobada(tip))
+	}
+	
+	test "cantidad de materias aprobadas" {
+		assert.equals(2, roque.cantidadMateriasAprobadas())
+	}
+	
+	test "promedio" {
+		assert.equals(8.50, roque.promedio())
+	}
+	
+	test "aprobar a una materia ya aprobada" {
+		assert.throwsException({roque.aprobar(mate1, 10)})
+	}
+
+	test "materias de sus carreras" {
+		assert.equals(#{ epl, mate1, obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
+	}
+	
+	test "puede inscribirse" {
+		
+		assert.that(roque.puedeInscribirse(obj2))
+		assert.notThat(roque.puedeInscribirse(historia)) // no es de la carrera
+		assert.notThat(roque.puedeInscribirse(obj1)) // ya la aprobo
+		assert.notThat(roque.puedeInscribirse(obj3)) // no cumple requisitos
+		assert.notThat(roque.puedeInscribirse(epl)) // ya inscripto 		
+		
+		
+	}
+	
+	
+	test "inscribir" {
+		assert.throwsException({roque.inscribir(historia)}) // no es de la carrera
+		roque.inscribir(bd)
+		assert.that(roque.inscripto(bd))
+		maria.inscribir(bd)
+		assert.that(maria.inscripto(bd))
+		
+		assert.equals([roque] , bd.confirmados())
+		assert.equals([maria] , bd.espera())
+		
+	}
+
+	test "desinscribir en espera" {
+		roque.inscribir(bd)
+		maria.inscribir(bd)
+		maria.desinscribir(bd)
+		
+		assert.equals([roque] , bd.confirmados())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(maria.inscripto(bd))
+	}
+
+	test "desinscribir confirmado" {
+		roque.inscribir(bd)
+		maria.inscribir(bd)
+		roque.desinscribir(bd)
+		
+		assert.equals([maria] , bd.confirmados())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(roque.inscripto(bd))
+		assert.that(maria.inscripto(bd))
+		
+		maria.desinscribir(bd)
+		assert.that(bd.confirmados().isEmpty())
+		assert.that(bd.espera().isEmpty())
+		assert.notThat(roque.inscripto(bd))
+		assert.notThat(maria.inscripto(bd))	 
+	}
+
+}
+
