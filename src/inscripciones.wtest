@@ -2,12 +2,13 @@ import inscripciones.*
 
 describe "inscripciones" {
 
-	const epl = new Materia()
-	const mate1 = new Materia()
-	const obj1 = new Materia()
-	const obj2 = new Materia(requisitos=#{obj1, mate1})
-	const obj3 = new Materia(requisitos=#{mate1, obj2})
-	const tip = new Materia()
+	const epl = new Materia(creditos=10)
+	const mate1 = new Materia(anio=2)
+	const obj1 = new Materia(anio=2)
+	const obj2 = new Materia(estrategiaDeRequisitos=new RequisitosPorCorrelativas(requisitos=#{obj1, mate1}))
+	const obj3 = new Materia(estrategiaDeRequisitos=new RequisitosPorCorrelativas(requisitos=#{mate1, obj2}))
+	const tip = new Materia(estrategiaDeRequisitos = new RequisitosPorCreditos(creditosNecesarios=10))
+	const mate2 = new Materia(anio=3, estrategiaDeRequisitos = requisitoPorAnio)
 
 	const bd = new Materia(cupo=1)
 	const quimica = new Materia()
@@ -19,7 +20,7 @@ describe "inscripciones" {
 	const historia = new Materia()
 	const penal1 = new Materia()
 	const penal2 = new Materia()
-	const programacion = new Carrera(materias = #{ epl, mate1, obj1, obj2, obj3, tip, bd })
+	const programacion = new Carrera(materias = #{ epl, mate1, mate2, obj1, obj2, obj3, tip, bd })
 	const medicina = new Carrera(materias = #{ quimica, biologia1, biologia2, anatomia })
 	const derecho = new Carrera(materias = #{ latin, romano, historia, penal1, penal2 })
 	
@@ -54,7 +55,7 @@ describe "inscripciones" {
 	}
 
 	test "materias de sus carreras" {
-		assert.equals(#{ epl, mate1, obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
+		assert.equals(#{ epl, mate1, mate2, obj1, obj2, obj3, tip, bd ,quimica, biologia1, biologia2, anatomia}, roque.todasLasMaterias())
 	}
 	
 	test "puede inscribirse" {
@@ -107,6 +108,22 @@ describe "inscripciones" {
 		assert.notThat(roque.inscripto(bd))
 		assert.notThat(maria.inscripto(bd))	 
 	}
+	
+	test "materia por creditos" {
+		roque.inscribir(tip)
+		assert.that(roque.inscripto(tip))
+		assert.throwsException({maria.inscribir(tip)})
+		assert.notThat(maria.inscripto(tip))
+	}
+	
+	test "materia por anio" {
+		roque.inscribir(mate2)
+		assert.that(roque.inscripto(mate2))
+		assert.throwsException({maria.inscribir(mate2)})
+		assert.notThat(maria.inscripto(mate2))
+	}
+	
+	
 
 }
 

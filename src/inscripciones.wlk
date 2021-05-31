@@ -1,12 +1,16 @@
 /** First Wollok example */
 class Materia {
-	const requisitos = #{}
 	
 	const inscriptos = []
 	const cupo = 30
 	
+	const property creditos = 5
+	const property anio = 1
+	
+	const estrategiaDeRequisitos = ningunRequisito
+	
 	method cumpleRequisitos(_estudiante) {
-		return requisitos.all({requisito => _estudiante.aprobada(requisito)})
+		return estrategiaDeRequisitos.cumpleRequisitos(_estudiante, self)
 	}
 	
 	method inscribir (estudiante) {
@@ -28,7 +32,41 @@ class Materia {
 	method inscripto(estudiante) {
 		return inscriptos.contains(estudiante)
 	}	
+	
 }
+
+object ningunRequisito {
+	method cumpleRequisitos(_estudiante, materia) {
+		return true
+	}
+}
+
+class RequisitosPorCreditos {
+	
+	const creditosNecesarios
+	
+	method cumpleRequisitos(_estudiante, materia) {
+		return _estudiante.creditos() >= creditosNecesarios	
+	}
+}
+
+object requisitoPorAnio  {
+	
+	method cumpleRequisitos(_estudiante, materia) {
+		return _estudiante.aproboAnioAnterior(materia)	
+	}
+	
+}
+
+class RequisitosPorCorrelativas {
+	const requisitos = #{}
+
+	method cumpleRequisitos(_estudiante, materia) {
+		return requisitos.all({requisito => _estudiante.aprobada(requisito)})
+	}
+	
+}
+
 
 class Estudiante {
 	const cursadasAprobadas = #{}	
@@ -104,6 +142,18 @@ class Estudiante {
 		materia.desinscribir(self)
 	}
 	
+	method creditos() {
+		return cursadasAprobadas.sum({cursada => cursada.creditos()})
+	}
+	
+	method aproboAnioAnterior(materia) {
+		return self.carrerasDe(materia).any({carrera => carrera.aproboAnio(self, materia.anio() - 1) })
+	}
+	
+	method carrerasDe(_materia) {
+		return carreras.filter({carrera => carrera.contiene(_materia)})
+	}
+	
 	
 }
 
@@ -114,10 +164,22 @@ class Carrera {
 		return materias.contains(_materia)
 	}
 	
+	method aproboAnio(_estudiante, anio) {
+		return self.materiasDelAnio(anio).all({materia => _estudiante.aprobada(materia)})
+	}
+	
+	method materiasDelAnio(anio) {
+		return materias.filter({materia => materia.anio() == anio })
+	}
+	
 }
 
 class CursadaAprobada {
 	const property materia
 	const property nota
+	
+	method creditos() {
+		return materia.creditos() 
+	}
 }
 
