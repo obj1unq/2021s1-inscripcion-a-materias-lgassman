@@ -14,6 +14,7 @@ class Materia {
 		if(self.enEspera(alumno) || self.confirmado(alumno)) {
 			self.error("el alumno ya esta en la materia")
 		}
+		//esto es un cambio
 	}
 	method inscribir(alumno) {
 		self.validarInscripcion(alumno)
